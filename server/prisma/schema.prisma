@@ -1,0 +1,54 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  teams     TeamMember[]
+  tasks     Task[]     @relation("assignee")
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  members   TeamMember[]
+  tasks     Task[]
+}
+
+model TeamMember {
+  id     String @id @default(cuid())
+  userId String
+  teamId String
+  role   String
+  user   User   @relation(fields: [userId], references: [id])
+  team   Team   @relation(fields: [teamId], references: [id])
+  @@unique([userId, teamId])
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  status      String    @default("TODO")
+  priority    String
+  dueDate     DateTime?
+  assigneeId  String?
+  teamId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  assignee    User?     @relation("assignee", fields: [assigneeId], references: [id])
+  team        Team      @relation(fields: [teamId], references: [id])
+}
