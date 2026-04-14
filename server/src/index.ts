@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import path from 'path'
 import authRouter from './routes/auth'
 import tasksRouter from './routes/tasks'
 import teamsRouter from './routes/teams'
@@ -19,7 +20,7 @@ for (const envVar of REQUIRED_ENV_VARS) {
 export const app = express()
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN || true,
   credentials: true,
 }))
 app.use(express.json())
@@ -29,6 +30,13 @@ app.use('/auth', authRouter)
 app.use('/api/tasks', tasksRouter)
 app.use('/api/teams', teamsRouter)
 app.use('/api/dashboard', dashboardRouter)
+
+// Serve React frontend in production
+const clientDist = path.join(__dirname, '../../client/dist')
+app.use(express.static(clientDist))
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'))
+})
 
 if (require.main === module) {
   const PORT = process.env.PORT || 3001
