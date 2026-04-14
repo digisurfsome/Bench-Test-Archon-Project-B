@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "cd server && npx tsx watch src/index.ts",
-    "dev:client": "cd client && npx vite"
+    "dev:client": "cd client && npx vite",
+    "build": "cd server && npm install && npx prisma generate --schema=../prisma/schema.prisma && npx tsc",
+    "start": "cd server && node dist/index.js"
   },
   "devDependencies": {
     "concurrently": "^8.0.0",
