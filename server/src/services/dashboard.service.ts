@@ -5,7 +5,7 @@ export async function getDashboardStats(userId: string) {
     where: { userId },
     select: { teamId: true }
   })
-  const teamIds = memberships.map(m => m.teamId)
+  const teamIds = memberships.map((m: { teamId: string }) => m.teamId)
 
   const statusGroups = await prisma.task.groupBy({
     by: ['status'],
@@ -18,7 +18,7 @@ export async function getDashboardStats(userId: string) {
     IN_PROGRESS: 0,
     REVIEW: 0,
     DONE: 0,
-    ...Object.fromEntries(statusGroups.map(g => [g.status, g._count.status]))
+    ...Object.fromEntries(statusGroups.map((g: { status: string; _count: { status: number } }) => [g.status, g._count.status]))
   }
 
   const overdueTasks = await prisma.task.findMany({

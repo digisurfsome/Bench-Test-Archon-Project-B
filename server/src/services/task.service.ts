@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client'
 import { prisma } from '../lib/prisma'
 import { isValidTransition } from '../lib/workflow'
 
@@ -47,9 +46,9 @@ export async function getTasks(
     where: { userId },
     select: { teamId: true }
   })
-  const teamIds = memberships.map(m => m.teamId)
+  const teamIds = memberships.map((m: { teamId: string }) => m.teamId)
 
-  const where: Prisma.TaskWhereInput = { teamId: { in: teamIds } }
+  const where: Record<string, unknown> = { teamId: { in: teamIds } }
   if (filters.status) where.status = filters.status
   if (filters.priority) where.priority = filters.priority
   if (filters.assigneeId) where.assigneeId = filters.assigneeId
@@ -65,13 +64,13 @@ export async function getTasks(
   const ALLOWED_SORT_FIELDS = ['priority', 'dueDate', 'createdAt', 'updatedAt', 'title', 'status'] as const
   type AllowedSortField = typeof ALLOWED_SORT_FIELDS[number]
 
-  const orderBy: Prisma.TaskOrderByWithRelationInput = {}
+  const orderBy: Record<string, string> = {}
   if (filters.sortBy) {
     if (!ALLOWED_SORT_FIELDS.includes(filters.sortBy as AllowedSortField)) {
       throw { status: 400, message: `Invalid sortBy field. Allowed: ${ALLOWED_SORT_FIELDS.join(', ')}` }
     }
     const field = filters.sortBy as AllowedSortField
-    orderBy[field] = (filters.sortOrder === 'asc' ? 'asc' : 'desc') as Prisma.SortOrder
+    orderBy[field] = filters.sortOrder === 'asc' ? 'asc' : 'desc'
   } else {
     orderBy.createdAt = 'desc'
   }

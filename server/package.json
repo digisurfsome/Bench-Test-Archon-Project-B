@@ -8,7 +8,7 @@
     "test": "npx vitest run"
   },
   "prisma": {
-    "schema": "../prisma/schema.prisma"
+    "schema": "./prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^5.7.0",

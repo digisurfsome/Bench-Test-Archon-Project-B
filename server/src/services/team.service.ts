@@ -33,7 +33,7 @@ export async function getTeam(teamId: string, userId: string) {
   })
   if (!team) throw { status: 404, message: 'Team not found' }
 
-  const membership = team.members.find(m => m.userId === userId)
+  const membership = team.members.find((m: { userId: string }) => m.userId === userId)
   if (!membership) throw { status: 403, message: 'Not a team member' }
 
   return team
